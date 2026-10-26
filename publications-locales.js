@@ -86,8 +86,7 @@
 
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/astuces?select=titre,contenu,photo&order=created_at.desc&limit=2`,
-      {
+`${SUPABASE_URL}/rest/v1/astuces?select=titre,contenu,photo&publication_forcee=eq.true&order=created_at.desc&limit=2`,      {
         headers: {
           apikey: SUPABASE_KEY
         }
