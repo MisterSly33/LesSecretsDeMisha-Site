@@ -1,1 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grimoire de Misha — Administration</title>
+<style>
+body{margin:0;background:#f6f0e2;color:#183c2d;font-family:Georgia,serif}
+header{background:#183c2d;color:white;text-align:center;padding:20px}
+main{max-width:750px;margin:30px auto;padding:15px}
+section{background:#fffdf7;padding:25px;border-radius:15px;margin-bottom:20px}
+label{display:block;margin-top:15px}
+input,textarea,select{box-sizing:border-box;width:100%;padding:12px;margin-top:5px}
+textarea{min-height:150px}
+button{background:#245b40;color:white;border:0;padding:12px;border-radius:8px;margin:12px 8px 0 0;cursor:pointer}
+.hidden{display:none}
+.item{border-top:1px solid #ddd;padding:12px 0}
+#message{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header>
+<h1>🌿 Le Grimoire de Misha</h1>
+<p>Administration des astuces</p>
+</header>
+<main>
+<section id="login">
+<h2>Connexion de Magali</h2>
+<form id="loginForm">
+<label>Adresse e-mail</label>
+<input id="email" type="email" required>
+<label>Mot de passe</label>
+<input id="password" type="password" required>
+<button>Se connecter</button>
+</form>
+</section>
 
+<div id="app" class="hidden">
+<section>
+<p id="user"></p>
+<button id="logout">Se déconnecter</button>
+</section>
+<section>
+<h2 id="formTitle">Nouvelle astuce</h2>
+<form id="tipForm">
+<label>Titre</label>
+<input id="titre" required>
+<label>Contenu</label>
+<textarea id="contenu" required></textarea>
+<label>Adresse de la photo</label>
+<input id="photo" type="url">
+<label>Catégorie</label>
+<input id="categorie">
+<label>Saison</label>
+<input id="saison">
+<label>Statut</label>
+<select id="statut">
+<option value="brouillon">Brouillon</option>
+<option value="publiée">Publiée</option>
+<option value="archivée">Archivée</option>
+</select>
+<button>Enregistrer</button>
+<button type="button" id="cancel">Nouvelle astuce</button>
+</form>
+</section>
+<section>
+<h2>Mes astuces</h2>
+<div id="liste"></div>
+</section>
+</div>
+<section id="message" class="hidden"></section>
+</main>
+
+<script type="module">
+import {createClient} from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const db=createClient(
+'https://fnxawannqbemythnavmd.supabase.co',
+'sb_publishable_UZrk3AxoTubdsq6-Mlsseg_809Bf5QR'
+);
+const ADMIN='616506dc-c6af-4def-b14b-dba83af1fa9a';
+const el=id=>document.getElementById(id);
+let editing=null;
+
+function message(txt){
+el('message').textContent=txt;
+el('message').classList.remove('hidden');
+}
+function reset(){
+editing=null;
+el('tipForm').reset();
+el('formTitle').textContent='Nouvelle astuce';
+}
+
+async function check(){
+const {data:{user}}=await db.auth.getUser();
+const allowed=user?.id===ADMIN;
+el('login').classList.toggle('hidden',allowed);
+el('app').classList.toggle('hidden',!allowed);
+if(user&&!allowed){
+await db.auth.signOut();
+message('Accès non autorisé.');
+}
+if(allowed){
+el('user').textContent=user.email;
+await load();
+}
+}
+
+el('loginForm').onsubmit=async e=>{
+e.preventDefault();
+const {error}=await db.auth.signInWithPassword({
+email:el('email').value,
+password:el('password').value
+});
+if(error)message(error.message);
+else{
+el('password').value='';
+await check();
+}
+};
+
+el('logout').onclick=async()=>{
+await db.auth.signOut();
+await check();
+};
+
+el('cancel').onclick=reset;
+
+async function load(){
+const {data,error}=await db.from('astuces')
+.select('id,titre,contenu,photo,categorie,saison,statut')
+.order('id',{ascending:false});
+if(error){message(error.message);return;}
+el('liste').replaceChildren();
+for(const tip of data){
+const div=document.createElement('div');
+div.className='item';
+const title=document.createElement('strong');
+title.textContent=tip.titre;
+const info=document.createElement('p');
+info.textContent=tip.statut;
+const button=document.createElement('button');
+button.textContent='Modifier';
+button.onclick=()=>{
+editing=tip.id;
+for(const key of ['titre','contenu','photo','categorie','saison']){
+el(key).value=tip[key]||'';
+}
+el('statut').value=tip.statut;
+el('formTitle').textContent='Modifier une astuce';
+window.scrollTo({top:0,behavior:'smooth'});
+};
+div.append(title,info,button);
+el('liste').append(div);
+}
+}
+
+el('tipForm').onsubmit=async e=>{
+e.preventDefault();
+const payload={};
+for(const key of ['titre','contenu','photo','categorie','saison','statut']){
+payload[key]=el(key).value;
+}
+let query=db.from('astuces');
+const result=editing===null
+?await query.insert(payload)
+:await query.update(payload).eq('id',editing);
+if(result.error){message(result.error.message);return;}
+message('Astuce enregistrée !');
+reset();
+await load();
+};
+
+await check();
+</script>
+</body>
+</html>
