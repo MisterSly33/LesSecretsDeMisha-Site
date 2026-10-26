@@ -31,11 +31,11 @@
     const published = arr.filter(x => x.publication === 'publie');
 
     if (!published.length) {
-      root.append(
-        el('p', 'Les nouveautés seront bientôt disponibles.')
-      ).className = 'misha-public-empty';
-      continue;
-    }
+  const message = el('p', 'Les nouveautés seront bientôt disponibles.');
+  message.className = 'misha-public-empty';
+  root.append(message);
+  continue;
+}  
 
     for (const o of published) {
       const card = el('article');
