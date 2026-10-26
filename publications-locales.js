@@ -88,8 +88,9 @@
     const response = await fetch(
 `${SUPABASE_URL}/rest/v1/astuces?select=titre,contenu,photo&publication_forcee=eq.true&order=created_at.desc&limit=2`,      {
         headers: {
-          apikey: SUPABASE_KEY
-        }
+  apikey: SUPABASE_KEY,
+  'Accept-Profile': 'public'
+}
       }
     );
 
