@@ -1,0 +1,9 @@
+LES SECRETS DE MISHA — VERSION 5, APERÇU PORTRAIT
+
+1. Ouvrir administration-demo.html, créer ou modifier un élément et cliquer « Publier ».
+2. Ouvrir index.html dans le MÊME navigateur : les rubriques Boutique, Agenda et Astuces sont intégrées au site original.
+3. Ouvrir apercu-publications.html pour l’aperçu simplifié.
+
+Photos affichées en portrait 3:4, entièrement visibles, sans découpe ni déformation, sur fond beige.
+
+ATTENTION : démonstration locale seulement. Les données sont dans le stockage local du navigateur. Rien n’est publié sur Internet et aucune commande réelle n’est traitée.
