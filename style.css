@@ -36,3 +36,8 @@
 
 /* Démonstration locale : nouvelles rubriques, photos portrait 3:4 */
 .misha-public-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,245px));gap:22px;justify-content:center;margin:24px auto;max-width:1100px}.misha-public-card{background:#fffdf8;border-radius:14px;padding:12px;box-shadow:0 3px 14px #172a2017;color:#263e2f}.misha-public-card img{display:block;width:100%;aspect-ratio:3/4;object-fit:contain;background:#f1eee5;border-radius:9px}.misha-public-card h3{margin:12px 0 6px}.misha-public-card p{white-space:pre-line}.misha-public-card a{color:#28563a}.misha-public-empty{text-align:center;grid-column:1/-1;opacity:.7}@media(max-width:550px){.misha-public-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.misha-public-card{padding:9px}}
+
+/* V7 : rubrique Astuces fusionnée */
+.misha-astuce-moment{margin:2rem auto 2.5rem;max-width:1100px}
+.misha-astuce-moment>h3{font-size:clamp(1.35rem,2.5vw,2rem);text-align:center;margin-bottom:1.5rem}
+.misha-previous-title{text-align:center;margin:2.5rem 0 1.2rem;font-size:1.45rem}
