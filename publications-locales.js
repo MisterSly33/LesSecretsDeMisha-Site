@@ -116,7 +116,7 @@
       id: 'misha-agenda',
       table: 'Agenda',
       params: {
-        select: 'titre,date_debut,date_fin,lieu,adresse,description,lien,statut',
+        select: 'titre,date_debut,date_fin,lieu,adresse,description,lien,photo,statut',
         statut: 'in.(publié,publie)',
         order: 'date_debut.asc'
       },
@@ -124,6 +124,7 @@
         const card = el('article');
         card.className = 'misha-public-card';
 
+        addPhoto(card, item.photo, item.titre);
         card.append(el('h3', item.titre || 'Événement'));
 
         if (item.date_debut) {
