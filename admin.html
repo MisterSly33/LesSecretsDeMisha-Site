@@ -28,19 +28,43 @@ function inputDate(iso){if(!iso)return '';const d=new Date(iso),p=n=>String(n).p
 function iso(id){return el(id).value?new Date(el(id).value).toISOString():null}
 
 async function optimizedPhoto(file){
-  if(!file.type.startsWith('image/'))throw new Error('Choisis une image.');
+  const formats=['image/jpeg','image/png','image/webp','image/heic','image/heif'];
+  if(!formats.includes(file.type.toLowerCase()) && !/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name))throw new Error('Choisis une photo JPEG, PNG, WebP ou HEIC.');
   if(file.size>25*1024*1024)throw new Error('Image trop lourde (maximum 25 Mo avant réduction).');
-  const bitmap=await createImageBitmap(file);
+  let source=null,cleanup=()=>{};
   try{
-    const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
+    // Certains navigateurs Android échouent avec createImageBitmap sur des JPEG valides.
+    // Une balise Image offre une autre voie de décodage.
+    try{
+      if(typeof createImageBitmap==='function'){
+        source=await createImageBitmap(file);
+        cleanup=()=>source.close();
+      }
+    }catch(_){source=null}
+    if(!source){
+      const url=URL.createObjectURL(file);
+      try{
+        source=await new Promise((resolve,reject)=>{
+          const img=new Image();
+          img.onload=()=>resolve(img);
+          img.onerror=()=>reject(new Error('Cette photo ne peut pas être lue par le navigateur. Essaie de la convertir en JPEG depuis la galerie.'));
+          img.src=url;
+        });
+      }finally{URL.revokeObjectURL(url)}
+    }
+    const width=source.naturalWidth||source.width,height=source.naturalHeight||source.height;
+    if(!width||!height)throw new Error('Dimensions de la photo indisponibles.');
+    const scale=Math.min(1,1600/Math.max(width,height));
     const canvas=document.createElement('canvas');
-    canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
-    canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);
+    canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+    const ctx=canvas.getContext('2d');
+    if(!ctx)throw new Error('Impossible de préparer la photo sur cet appareil.');
+    ctx.drawImage(source,0,0,canvas.width,canvas.height);
     const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',0.78));
-    if(!blob)throw new Error('Impossible de préparer cette image.');
+    if(!blob||blob.type!=='image/webp')throw new Error('La conversion WebP n’est pas prise en charge par ce navigateur.');
     if(blob.size>5*1024*1024)throw new Error('La photo reste trop lourde après réduction.');
     return blob;
-  }finally{bitmap.close()}
+  }finally{cleanup()}
 }
 for(const [prefix,field] of [['','photo'],['p_','p_photo'],['a_','a_photo']]){
   el(prefix+'uploadBtn').onclick=async()=>{
