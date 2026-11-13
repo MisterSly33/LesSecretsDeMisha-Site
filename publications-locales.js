@@ -127,21 +127,38 @@
         card.append(el('h3', item.titre || 'Événement'));
 
         if (item.date_debut) {
-          const date = new Date(item.date_debut);
-
-          if (!Number.isNaN(date.getTime())) {
-            card.append(el('p', new Intl.DateTimeFormat('fr-FR', {
-              dateStyle: 'long',
-              timeStyle: 'short',
-              timeZone: 'Europe/Paris'
-            }).format(date)));
+          const debut = new Date(item.date_debut);
+          const fin = item.date_fin ? new Date(item.date_fin) : null;
+          const validFin = fin && !Number.isNaN(fin.getTime()) && fin > debut;
+          const dateFmt = new Intl.DateTimeFormat('fr-FR', {
+            dateStyle: 'long', timeZone: 'Europe/Paris'
+          });
+          const dateHeureFmt = new Intl.DateTimeFormat('fr-FR', {
+            dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris'
+          });
+          const heureFmt = new Intl.DateTimeFormat('fr-FR', {
+            timeStyle: 'short', timeZone: 'Europe/Paris'
+          });
+          if (!Number.isNaN(debut.getTime())) {
+            let texte = dateHeureFmt.format(debut);
+            if (validFin) {
+              if (dateFmt.format(debut) === dateFmt.format(fin)) {
+                texte = `${dateFmt.format(debut)} · de ${heureFmt.format(debut)} à ${heureFmt.format(fin)}`;
+              } else {
+                texte = `Du ${dateHeureFmt.format(debut)} au ${dateHeureFmt.format(fin)}`;
+              }
+            }
+            card.append(el('p', texte));
           }
         }
 
         if (item.lieu) card.append(el('p', item.lieu));
         if (item.adresse) card.append(el('p', item.adresse));
         if (item.description) {
-          card.append(el('p', item.description));
+          const description = el('p', item.description);
+          description.style.whiteSpace = 'pre-line';
+          description.style.overflowWrap = 'anywhere';
+          card.append(description);
         }
 
         addLink(card, item.lien);
