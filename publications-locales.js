@@ -117,7 +117,7 @@
       table: 'Agenda',
       params: {
         select: 'titre,date_debut,date_fin,lieu,adresse,description,lien,statut',
-        statut: 'eq.publié',
+        statut: 'in.(publié,publie)',
         order: 'date_debut.asc'
       },
       render(item) {
