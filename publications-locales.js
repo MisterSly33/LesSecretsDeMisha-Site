@@ -171,7 +171,7 @@
       table: 'astuces',
       params: {
         select: 'titre,contenu,photo',
-        publication_forcee: 'eq.true',
+        statut: 'eq.publiée',
         order: 'created_at.desc',
         limit: '2'
       },
