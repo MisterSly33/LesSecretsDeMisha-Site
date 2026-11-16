@@ -41,3 +41,43 @@
 .misha-astuce-moment{margin:2rem auto 2.5rem;max-width:1100px}
 .misha-astuce-moment>h3{font-size:clamp(1.35rem,2.5vw,2rem);text-align:center;margin-bottom:1.5rem}
 .misha-previous-title{text-align:center;margin:2.5rem 0 1.2rem;font-size:1.45rem}
+
+/* Boutique et agenda : rangées horizontales, sans modifier les astuces. */
+#misha-produits, #misha-agenda {
+  display:flex; flex-wrap:nowrap; justify-content:flex-start;
+  gap:18px; overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; scroll-behavior:smooth;
+  overscroll-behavior-inline:contain; -webkit-overflow-scrolling:touch;
+  max-width:1100px; padding:8px 5px 20px; margin:20px auto;
+  scrollbar-width:thin; scrollbar-color:#839b7d transparent;
+}
+#misha-produits > .misha-public-card, #misha-agenda > .misha-public-card {
+  flex:0 0 clamp(215px, 28%, 280px); min-width:0;
+  scroll-snap-align:start; box-sizing:border-box;
+}
+#misha-produits > .misha-public-empty, #misha-agenda > .misha-public-empty {
+  flex:1 0 100%;
+}
+.misha-carousel-controls {
+  display:flex; justify-content:flex-end; align-items:center;
+  gap:10px; max-width:1100px; margin:0 auto 2px;
+}
+.misha-carousel-controls[hidden] {display:none}
+.misha-carousel-controls button {
+  border:1px solid #82967b; background:#fffdf8; color:#244630;
+  width:39px; height:39px; border-radius:50%; font-size:24px;
+  cursor:pointer; line-height:1;
+}
+.misha-carousel-controls button:disabled {opacity:.3;cursor:default}
+.misha-carousel-controls button:focus-visible {outline:3px solid #a3a967;outline-offset:2px}
+.misha-carousel-hint {font-size:.9rem;color:#355441;margin-right:auto}
+@media(max-width:550px) {
+  #misha-produits, #misha-agenda {gap:12px;padding-inline:14px;scroll-padding-inline:14px}
+  #misha-produits > .misha-public-card, #misha-agenda > .misha-public-card {
+    flex:0 0 min(78vw,290px);
+  }
+  .misha-carousel-controls {padding-inline:14px}
+}
+@media(prefers-reduced-motion:reduce) {
+  #misha-produits, #misha-agenda {scroll-behavior:auto}
+}
