@@ -109,6 +109,24 @@
           `${prix} · ${disponible ? 'Disponible' : 'Indisponible'}`
         ));
 
+        if (disponible) {
+          const wrap = el('div'); wrap.className = 'misha-product-actions';
+          const label = el('label', 'Quantité ');
+          const qty = el('input'); qty.type = 'number'; qty.min = '1'; qty.step = '1'; qty.value = '1';
+          qty.max = item.stock === null || item.stock === undefined ? '99' : String(Math.max(1, Math.floor(item.stock)));
+          qty.setAttribute('aria-label', `Quantité de ${item.nom || 'produit'}`);
+          label.append(qty);
+          const button = el('button', 'Ajouter au panier +'); button.type = 'button'; button.className = 'misha-order-link';
+          button.addEventListener('click', () => {
+            const n = Number(qty.value);
+            if (!Number.isInteger(n) || n < 1 || n > Number(qty.max)) {
+              qty.reportValidity(); return;
+            }
+            window.mishaAddToCart?.({name:item.nom || 'Création de Misha',price:item.prix == null ? null : Number(item.prix),max:Number(qty.max)},n);
+          });
+          wrap.append(label,button); card.append(wrap);
+        }
+
         return card;
       }
     },
@@ -163,29 +181,6 @@
         }
 
         addLink(card, item.lien);
-        return card;
-      }
-    },
-    {
-      id: 'misha-astuces',
-      table: 'astuces',
-      params: {
-        select: 'titre,contenu,photo',
-        statut: 'eq.publiée',
-        order: 'created_at.desc',
-        limit: '2'
-      },
-      render(item) {
-        const card = el('article');
-        card.className = 'misha-public-card';
-
-        addPhoto(card, item.photo, item.titre);
-        card.append(el('h3', item.titre || 'Astuce de Misha'));
-
-        if (item.contenu) {
-          card.append(el('p', item.contenu));
-        }
-
         return card;
       }
     }
