@@ -1,9 +1,19 @@
-LES SECRETS DE MISHA — VERSION 5, APERÇU PORTRAIT
+MISE À JOUR — CONFIRMATION COMMANDE + NEWSLETTER
 
-1. Ouvrir administration-demo.html, créer ou modifier un élément et cliquer « Publier ».
-2. Ouvrir index.html dans le MÊME navigateur : les rubriques Boutique, Agenda et Astuces sont intégrées au site original.
-3. Ouvrir apercu-publications.html pour l’aperçu simplifié.
+À remplacer / ajouter à la racine de GitHub :
+- index.html (remplacer)
+- style.css (remplacer)
+- panier.js (remplacer)
+- newsletter.js (AJOUTER)
 
-Photos affichées en portrait 3:4, entièrement visibles, sans découpe ni déformation, sur fond beige.
+Ne pas remplacer les autres fichiers.
 
-ATTENTION : démonstration locale seulement. Les données sont dans le stockage local du navigateur. Rien n’est publié sur Internet et aucune commande réelle n’est traitée.
+COMMANDES : après réponse positive de FormSubmit, une fenêtre de confirmation affiche la référence, les produits, le montant et la remise.
+Copie client : l’option _cc de FormSubmit demande l'envoi d'une copie au client ; vérifier qu'elle arrive réellement (y compris dans les indésirables). Ce n'est PAS une confirmation d'acceptation de la commande.
+
+NEWSLETTER : le formulaire transmet une demande d'inscription par FormSubmit, pas une inscription automatique dans un outil de campagne. La réception doit être testée, et les abonnés doivent être gérés dans une liste sécurisée avec possibilité de désinscription. Ne pas envoyer de campagnes avant cette configuration.
+
+TESTS :
+1. Commande test -> pop-up + e-mail Misha + copie client (si FormSubmit l'accepte).
+2. Inscription newsletter test -> message de succès + e-mail à Misha.
+3. Vérifier sur téléphone et ordinateur.

@@ -9,6 +9,9 @@
   const shopCount = document.getElementById('misha-shop-count');
   const form = document.getElementById('misha-order-form');
   const status = document.getElementById('misha-order-status');
+  const dialog = document.getElementById('misha-order-dialog');
+  const dialogRecap = document.getElementById('misha-confirm-recap');
+  document.getElementById('misha-confirm-close')?.addEventListener('click', () => dialog.close());
   const money = n => n.toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
   const render = () => {
     lines.replaceChildren();
@@ -51,6 +54,7 @@
     const payload = {
       _subject: `MISHA | Nouvelle demande | ${money(montant)} | ${reference}`,
       _captcha: 'true',
+      _cc: String(data.get('email')), // Copie du récapitulatif au client (option FormSubmit à vérifier en test réel).
       _template: 'table',
       'Référence': reference,
       'Client': data.get('nom'),
@@ -66,8 +70,16 @@
       const response=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
       const result=await response.json();
       if(!response.ok || result.success===false || result.success==='false') throw new Error(result.message||'Envoi non confirmé');
-      status.textContent=`Votre demande ${reference} a été transmise. Misha vous répondra pour la confirmer.`;
-      cart.clear();render();form.reset();status.textContent=`Merci ! Votre demande ${reference} a été transmise. Misha vous répondra pour confirmer les détails.`;
+      // Le récapitulatif est construit à partir de la demande effectivement envoyée.
+      dialogRecap.replaceChildren();
+      const heading = document.createElement('strong'); heading.textContent = `Référence : ${reference}`; dialogRecap.append(heading);
+      const productList = document.createElement('pre'); productList.textContent = detail; dialogRecap.append(productList);
+      const totalLine = document.createElement('p'); totalLine.textContent = `Total produits : ${totalLisible}`; dialogRecap.append(totalLine);
+      const delivery = document.createElement('p'); delivery.textContent = `Remise : ${data.get('remise')}`; dialogRecap.append(delivery);
+      const emailInfo = document.createElement('p'); emailInfo.textContent = `Adresse e-mail : ${data.get('email')}`; dialogRecap.append(emailInfo);
+      cart.clear();render();form.reset();
+      status.textContent=`Merci ! Votre demande ${reference} a bien été envoyée. Misha vous répondra pour la confirmer.`;
+      if (dialog?.showModal) dialog.showModal();
     } catch (error) {
       console.error('Envoi de commande impossible',error);
       status.textContent="L'envoi n'a pas pu être confirmé. Votre panier est conservé ; réessayez plus tard ou contactez Misha par téléphone au 06 60 85 06 11.";
