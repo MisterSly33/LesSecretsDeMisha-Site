@@ -45,7 +45,23 @@
     const data=new FormData(form);
     const detail=[...cart].map(([name,item])=>`${name} : ${item.quantity} × ${item.price === null ? 'prix à confirmer' : money(item.price)}`).join('\n');
     const reference=`MISHA-${Date.now().toString(36).toUpperCase()}`;
-    const payload={_subject:`Demande boutique ${reference}`,_captcha:'true',_template:'table',reference,nom:data.get('nom'),email:data.get('email'),telephone:data.get('telephone')||'Non renseigné',remise:data.get('remise'),message:data.get('message')||'Aucun',produits:detail,total_produits:`${[...cart.values()].reduce((s,i)=>s+(i.price||0)*i.quantity,0).toFixed(2)} EUR (hors produits sans prix et livraison)`};
+    const montant = [...cart.values()].reduce((s,i)=>s+(i.price||0)*i.quantity,0);
+    const aPrixConfirmer = [...cart.values()].some(i=>i.price===null);
+    const totalLisible = `${money(montant)}${aPrixConfirmer ? ' + articles à prix à confirmer' : ''} (hors éventuels frais de livraison)`;
+    const payload = {
+      _subject: `MISHA | Nouvelle demande | ${money(montant)} | ${reference}`,
+      _captcha: 'true',
+      _template: 'table',
+      'Référence': reference,
+      'Client': data.get('nom'),
+      'E-mail': data.get('email'),
+      'Téléphone': data.get('telephone') || 'Non renseigné',
+      'Produits et quantités': detail,
+      'Total des produits': totalLisible,
+      'Remise souhaitée': data.get('remise'),
+      'Message du client': data.get('message') || 'Aucun',
+      'Statut': 'Demande à confirmer personnellement par Misha'
+    };
     try {
       const response=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
       const result=await response.json();
