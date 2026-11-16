@@ -6,6 +6,7 @@
   const lines = document.getElementById('misha-cart-lines');
   const total = document.getElementById('misha-cart-total');
   const count = document.getElementById('misha-cart-count');
+  const shopCount = document.getElementById('misha-shop-count');
   const form = document.getElementById('misha-order-form');
   const status = document.getElementById('misha-order-status');
   const money = n => n.toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
@@ -25,6 +26,7 @@
     }
     if (!n) {const p=document.createElement('p');p.textContent='Votre panier est vide.';lines.append(p);}
     count.textContent=`(${n})`;
+    if (shopCount) shopCount.textContent=`(${n})`;
     total.textContent=n ? `Total des produits : ${money(sum)}${hasUnpriced ? ' + produits à prix sur demande' : ''} — hors frais éventuels d'expédition.` : '';
     form.hidden=!n;
   };
